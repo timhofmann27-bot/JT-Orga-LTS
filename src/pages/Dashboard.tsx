@@ -191,7 +191,8 @@ export default function Dashboard() {
                 <span className={`w-2 h-2 rounded-full shrink-0 ${r.status === "yes" ? "bg-success" : r.status === "no" ? "bg-danger" : "bg-warning"}`} />
                 <span className="text-sm text-text truncate">{r.person_name}</span>
                 <span className="text-xs text-text-dim truncate">{r.event_title}</span>
-                <span className="text-[10px] text-text-dim ml-auto">{r.responded_at ? formatDistanceToNow(parseISO(r.responded_at), { addSuffix: true, locale: de }) : "- "}</span>
+                <span className="text-[10px] text-text-dim">{r.comment ? r.comment : ""}</span>
+                  <span className="text-[10px] text-text-dim ml-auto">{r.responded_at ? formatDistanceToNow(parseISO(r.responded_at), { addSuffix: true, locale: de }) : "- "}</span>
               </div>
             ))}
           </div>

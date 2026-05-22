@@ -307,13 +307,22 @@ adminRouter.delete('/events/:id/invites/:inviteId', (req, res) => {
 adminRouter.put('/events/:id/invites/:inviteId/status', (req, res) => {
   try {
     const { status } = req.body;
-    if (!['yes', 'no', 'maybe', 'pending'].includes(status)) {
+    if (status && !['yes', 'no', 'maybe', 'pending'].includes(status)) {
       return res.status(400).json({ error: 'Ungültiger Status' });
     }
-    db.prepare('UPDATE invitees SET status = ?, responded_at = CURRENT_TIMESTAMP WHERE id = ? AND event_id = ?').run(status, req.params.inviteId, req.params.id);
+    // Update all editable fields — status, comment, guests_count
+    const invite = db.prepare('SELECT * FROM invitees WHERE id = ? AND event_id = ?').get(req.params.inviteId, req.params.id) as any;
+    if (!invite) return res.status(404).json({ error: 'Nicht gefunden' });
+
+    const newStatus = status !== undefined ? status : invite.status;
+    const newComment = req.body.comment !== undefined ? req.body.comment : invite.comment;
+    const newGuests = req.body.guests_count !== undefined ? req.body.guests_count : invite.guests_count;
+
+    db.prepare('UPDATE invitees SET status = ?, comment = ?, guests_count = ? WHERE id = ? AND event_id = ?')
+      .run(newStatus, newComment, newGuests, req.params.inviteId, req.params.id);
     res.json({ success: true });
   } catch (e: any) {
-    res.status(400).json({ error: 'Fehler beim Aktualisieren des Status' });
+    res.status(400).json({ error: 'Fehler beim Aktualisieren' });
   }
 });
 
@@ -349,8 +358,31 @@ adminRouter.put('/persons/:id', (req, res) => {
   }
 });
 adminRouter.delete('/persons/:id', (req, res) => {
-  db.prepare('DELETE FROM persons WHERE id = ?').run(req.params.id);
+  const personId = req.params.id;
+  db.transaction(() => {
+    // Delete all invitees linked to this person (orphan cleanup)
+    db.prepare('DELETE FROM invitees WHERE person_id = ?').run(personId);
+    // Delete notifications
+    db.prepare("DELETE FROM notifications WHERE user_type = 'person' AND user_id = ?").run(personId);
+    // Delete poll responses
+    db.prepare('DELETE FROM poll_responses WHERE person_id = ?').run(personId);
+    // Unclaim checklist items
+    db.prepare('UPDATE checklists SET claimer_person_id = NULL WHERE claimer_person_id = ?').run(personId);
+    // Finally delete the person
+    db.prepare('DELETE FROM persons WHERE id = ?').run(personId);
+  })();
   res.json({ success: true });
+
+// Clean up orphaned invitees (persons who no longer exist)
+adminRouter.delete('/invitees/orphans', (req, res) => {
+  const orphans = db.prepare('SELECT i.id FROM invitees i LEFT JOIN persons p ON i.person_id = p.id WHERE i.person_id IS NOT NULL AND p.id IS NULL').all() as any[];
+  if (orphans.length > 0) {
+    const ids = orphans.map((o: any) => o.id);
+    db.prepare('DELETE FROM invitees WHERE id IN (' + ids.join(',') + ')').run();
+  }
+  // Also delete invitees with NULL person_id (from ON DELETE SET NULL)
+  const nulled = db.prepare('DELETE FROM invitees WHERE person_id IS NULL').changes;
+  res.json({ cleaned: orphans.length + (nulled || 0) });
 });
 
 // CSV Import: POST /persons/import

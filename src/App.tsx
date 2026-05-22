@@ -5,6 +5,14 @@
 
 import React, { Suspense, useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  React.useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
+}
 import { Toaster } from 'react-hot-toast';
 import AdminLayout from './components/AdminLayout';
 import Login from './pages/Login';
