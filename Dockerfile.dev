@@ -1,0 +1,36 @@
+# ============================================================================
+# JT-Orga Development Dockerfile
+# Hot-Reload, Dev-Server, volle Dependencies
+# ============================================================================
+
+FROM node:22-alpine
+
+# Dev-Tools installieren
+RUN apk add --no-cache curl
+
+WORKDIR /app
+
+# Package-Dateien kopieren (Layer-Caching)
+COPY package*.json ./
+
+# Alle Dependencies installieren (inkl. devDependencies)
+RUN npm ci
+
+# Source-Code wird als Volume gemountet, nicht kopiert!
+# COPY . . entfällt hier - kommt vom Host-Volume
+
+# Data-Verzeichnis erstellen
+RUN mkdir -p /app/data
+
+# Port freigeben
+EXPOSE 3000
+
+# Environment-Variablen für Dev-Modus
+ENV NODE_ENV=development
+ENV HOST=0.0.0.0
+ENV PORT=3000
+ENV CHOKIDAR_USEPOLLING=true
+ENV WATCHPACK_POLLING=true
+
+# Dev-Server starten mit Hot-Reload
+CMD ["npm", "run", "dev"]

@@ -1,0 +1,44 @@
+# Security Policy
+# JT-Orga Security Contact
+
+## Supported Versions
+
+| Version | Supported          |
+| ------- | ------------------ |
+| 1.x     | :white_check_mark: |
+
+## Report a Vulnerability
+
+If you discover a security vulnerability within JT-Orga, please report it responsibly:
+
+1. **DO NOT** create a public GitHub issue for security vulnerabilities
+2. Send a detailed description to the project maintainers
+3. Include steps to reproduce the issue
+4. Allow 48 hours for initial response
+
+## Security Requirements
+
+- All passwords must meet minimum complexity requirements (12+ characters, uppercase, lowercase, numbers, special characters)
+- JWT tokens expire after 1 day (admin) or 7 days (person)
+- Failed login attempts result in account lockout after 5 attempts
+- All API endpoints require valid authentication tokens
+- Rate limiting is enforced on authentication endpoints
+
+## Security Headers
+
+This application implements the following security headers:
+- Content-Security-Policy
+- X-Content-Type-Options: nosniff
+- X-Frame-Options: DENY
+- Referrer-Policy: strict-origin-when-cross-origin
+- Permissions-Policy
+
+## Encryption
+
+- All passwords are hashed using bcrypt (work factor 14)
+- All API communication requires HTTPS
+- Cookies are marked as HttpOnly, Secure, and SameSite=Lax
+
+## Last Updated
+
+2026-04-20

@@ -1,0 +1,36 @@
+{
+  "exclude": ["node_modules", "public", "storybook-static", "dist", "tests", "app-architecture-agent", "app-architecture-agent-workspace", "backend-api-agent", "backend-api-agent-workspace", "security-agent", "security-agent-workspace", "testing-qa-agent", "testing-qa-agent-workspace", "visual-design-agent", "visual-design-agent-workspace"],
+  "compilerOptions": {
+    "target": "ES2022",
+    "experimentalDecorators": true,
+    "useDefineForClassFields": false,
+    "module": "ESNext",
+    "lib": [
+      "ES2022",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "skipLibCheck": true,
+    "moduleResolution": "bundler",
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "allowJs": true,
+    "jsx": "react-jsx",
+    "paths": {
+      "@/*": [
+        "./*"
+      ]
+    },
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
+    "types": ["vite/client"]
+  },
+  "exclude": [
+    "node_modules",
+    "dist",
+    "public",
+    "storybook-static",
+    "tests",
+    "**/*.stories.tsx"
+  ]
+}

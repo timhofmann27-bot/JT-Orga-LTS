@@ -1,0 +1,10 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "pro.jtorga.app",
+    "sha256_cert_fingerprints": [
+      "4B:7D:80:55:B9:AF:60:41:FD:BB:22:A9:EF:5C:E8:19:86:F4:FB:6C:52:0D:F0:FD:33:6A:D2:B6:AA:A9:0D:5C"
+    ]
+  }
+}]

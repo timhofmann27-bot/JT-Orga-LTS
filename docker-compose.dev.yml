@@ -1,0 +1,49 @@
+# ============================================================================
+# JT-Orga Development Docker Compose
+# Hot-Reload, WiFi-Zugriff vom Handy, keine Production-Hardening
+# ============================================================================
+
+services:
+  jt-orga-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: jt-orga-dev
+    restart: unless-stopped
+
+    # .env Datei laden (JWT_SECRET, ADMIN_PASSWORD, etc.)
+    env_file: .env
+
+    # Dev-Modus: Hot-Reload aktivieren
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      - HOST=0.0.0.0
+      - CHOKIDAR_USEPOLLING=true
+      - WATCHPACK_POLLING=true
+
+    # Ports: an 0.0.0.0 binden damit das Handy per WLAN zugreifen kann
+    # Host-Port auf 3010 geändert da 3000-3003 belegt sind
+    ports:
+      - "3010:3000"
+
+    # Source-Code mounten für Hot-Reload
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - app-data:/app/data
+
+    # Logging (ausführlich im Dev-Modus)
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "3"
+
+volumes:
+  app-data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${PWD}/data

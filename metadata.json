@@ -1,0 +1,5 @@
+{
+  "name": "JT-ORGA",
+  "description": "Premium Event-Management-Plattform für exklusive Organisation und Teilnehmer-Interaktion.",
+  "requestFramePermissions": ["geolocation"]
+}
